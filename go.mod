@@ -1,1 +1,1 @@
-module "gocast2"
+module "github.com/lambda-direct/gocast-stock-calc"
