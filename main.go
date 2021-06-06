@@ -7,7 +7,7 @@ import (
 	"math"
 	"os"
 	"sync"
-	timeNative "time"
+	gotime "time"
 
 	"github.com/lambda-direct/gocast-stock-calc/data"
 )
@@ -31,14 +31,14 @@ func main() {
 	ds4h := ds.SliceByTime(initialTime - time.Hours(4).Ms())
 	ds24h := ds.SliceByTime(initialTime - time.Hours(24).Ms())
 
-	now := timeNative.Now()
+	now := gotime.Now()
 	recursion(ds5min)
 	recursion(ds30min)
 	recursion(ds4h)
 	recursion(ds24h)
-	log.Printf("consecutive took %fms", float32(timeNative.Now().Sub(now).Nanoseconds())/float32(timeNative.Millisecond))
+	log.Printf("consecutive took %.3fms", float64(gotime.Now().Sub(now).Nanoseconds())/float64(gotime.Millisecond))
 
-	now = timeNative.Now()
+	now = gotime.Now()
 
 	tupleChan := parallel(
 		[]*TupleInput{
@@ -73,7 +73,7 @@ func main() {
 		log.Printf("%s %.3fms %+v", tuple.name, tuple.durationMs, tuple.stats)
 	}
 
-	log.Printf("parallel took %fms", float32(timeNative.Now().Sub(now).Nanoseconds())/float32(timeNative.Millisecond))
+	log.Printf("parallel took %.3fms", float64(gotime.Now().Sub(now).Nanoseconds())/float64(gotime.Millisecond))
 }
 
 func recursion(ds data.Set) *data.Stats {
@@ -120,12 +120,12 @@ func parallel(tuples []*TupleInput) <-chan *TupleOutput {
 	for _, tuple := range tuples {
 		go func(tuple *TupleInput) {
 			defer wg.Done()
-			now := timeNative.Now()
+			now := gotime.Now()
 			stats := tuple.fn()
 			tupleChan <- &TupleOutput{
 				name:       tuple.name,
 				stats:      stats,
-				durationMs: float32(timeNative.Now().Sub(now).Nanoseconds()) / float32(timeNative.Millisecond),
+				durationMs: float32(gotime.Now().Sub(now).Nanoseconds()) / float32(gotime.Millisecond),
 			}
 		}(tuple)
 	}
