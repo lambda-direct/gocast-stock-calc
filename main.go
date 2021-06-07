@@ -26,17 +26,17 @@ func main() {
 
 	initialTime := ds[0].Timestamp
 
-	ds5min := ds.SliceByTime(initialTime - time.Minutes(5).Ms())
-	ds30min := ds.SliceByTime(initialTime - time.Minutes(30).Ms())
-	ds4h := ds.SliceByTime(initialTime - time.Hours(4).Ms())
-	ds24h := ds.SliceByTime(initialTime - time.Hours(24).Ms())
+	ds5min := ds.SliceByTime(initialTime - time.New(5, gotime.Minute).To(gotime.Millisecond))
+	ds30min := ds.SliceByTime(initialTime - time.New(30, gotime.Minute).To(gotime.Millisecond))
+	ds4h := ds.SliceByTime(initialTime - time.New(4, gotime.Hour).To(gotime.Millisecond))
+	ds24h := ds.SliceByTime(initialTime - time.New(24, gotime.Hour).To(gotime.Millisecond))
 
 	now := gotime.Now()
 	recursion(ds5min)
 	recursion(ds30min)
 	recursion(ds4h)
 	recursion(ds24h)
-	log.Printf("consecutive took %.3fms", float64(gotime.Now().Sub(now).Nanoseconds())/float64(gotime.Millisecond))
+	log.Printf("consecutive took %.3fms", float64(gotime.Since(now).Nanoseconds())/float64(gotime.Millisecond))
 
 	now = gotime.Now()
 
@@ -73,7 +73,7 @@ func main() {
 		log.Printf("%s %.3fms %+v", tuple.name, tuple.durationMs, tuple.stats)
 	}
 
-	log.Printf("parallel took %.3fms", float64(gotime.Now().Sub(now).Nanoseconds())/float64(gotime.Millisecond))
+	log.Printf("parallel took %.3fms", float64(gotime.Since(now).Nanoseconds())/float64(gotime.Millisecond))
 }
 
 func recursion(ds data.Set) *data.Stats {
@@ -125,7 +125,7 @@ func parallel(tuples []*TupleInput) <-chan *TupleOutput {
 			tupleChan <- &TupleOutput{
 				name:       tuple.name,
 				stats:      stats,
-				durationMs: float32(gotime.Now().Sub(now).Nanoseconds()) / float32(gotime.Millisecond),
+				durationMs: float32(gotime.Since(now).Nanoseconds()) / float32(gotime.Millisecond),
 			}
 		}(tuple)
 	}
