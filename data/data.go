@@ -3,8 +3,8 @@ package data
 import "math"
 
 type Point struct {
-	Rate      float64 `json:"rate" required:"true"`
-	Timestamp uint64  `json:"timestamp" required:"true"`
+	Rate      float64 `json:"rate" required:"true" db:"rate"`
+	Timestamp uint64  `json:"timestamp" required:"true" db:"timestamp"`
 }
 
 type Set []Point

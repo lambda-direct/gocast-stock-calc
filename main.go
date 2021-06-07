@@ -1,8 +1,9 @@
 package main
 
 import (
-	"encoding/json"
-	"github.com/lambda-direct/gocast-stock-calc/time"
+	"context"
+	"github.com/lambda-direct/gocast-stock-calc/pg"
+	"github.com/lambda-direct/gocast-stock-calc/util"
 	"log"
 	"math"
 	"os"
@@ -10,19 +11,23 @@ import (
 	gotime "time"
 
 	"github.com/lambda-direct/gocast-stock-calc/data"
+	"github.com/lambda-direct/gocast-stock-calc/time"
 )
 
 func main() {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	pgClient, err := pg.New(ctx)
+	util.PanicOnError(err)
+
+	defer pgClient.Close()
+
 	file, err := os.Open("data.json")
-	if err != nil {
-		panic(err)
-	}
+	util.PanicOnError(err)
 
-	var ds data.Set
-
-	if err := json.NewDecoder(file).Decode(&ds); err != nil {
-		panic(err)
-	}
+	ds, err := pgClient.SyncData(ctx, file)
+	util.PanicOnError(err)
 
 	initialTime := ds[0].Timestamp
 
