@@ -60,12 +60,12 @@ func main() {
 					return recursion(ds4h)
 				},
 			},
-			//{
-			//	name: "24h",
-			//	fn: func() *data.Stats {
-			//		return recursion(ds24h)
-			//	},
-			//},
+			{
+				name: "24h",
+				fn: func() *data.Stats {
+					return recursion(ds24h)
+				},
+			},
 		},
 	)
 
